@@ -1,4 +1,4 @@
-import type { WorkflowGraph } from "./types/graph";
+import type { WorkflowGraph } from "../types/graph";
 
 export function toMermaid(graph: WorkflowGraph): string {
   const lines = ["flowchart TD"];

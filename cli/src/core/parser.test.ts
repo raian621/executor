@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseTomlWorkflow } from "./parser";
-import type { Workflow } from "./types/workflow";
+import type { Workflow } from "../types/workflow";
 
 test("parses TOML into Workflow object", () => {
   const toml = `name = "My Test Workflow"

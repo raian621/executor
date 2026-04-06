@@ -1,6 +1,6 @@
 import { test, expect, vi } from 'bun:test';
-import { executeWorkflow } from './executor';
-import type { Workflow } from './types/workflow';
+import { Executor } from './executor';
+import type { Workflow } from '../types/workflow';
 
 test('workflow completes', async () => {
   const workflow: Workflow = {
@@ -23,5 +23,5 @@ test('workflow completes', async () => {
     ],
   };
 
-  expect(executeWorkflow(workflow)).resolves.toBeUndefined();
+  expect(new Executor(workflow, 8).executeWorkflow()).resolves.toBeUndefined();
 });

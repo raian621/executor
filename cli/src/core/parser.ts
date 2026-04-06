@@ -1,6 +1,6 @@
 import { parse as parseToml } from "toml";
-import type { Workflow } from "./types/workflow";
-import type { Step } from "./types/step";
+import type { Workflow } from "../types/workflow";
+import type { Step } from "../types/step";
 import { fail } from "assert";
 
 export function parseTomlWorkflow(tomlStr: string): Workflow {
