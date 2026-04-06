@@ -1,7 +1,7 @@
 import { build, spawn } from "bun";
 import { buildGraph } from "./graph";
 import type { WorkflowGraph } from "../types/graph";
-import type { Step, StepId } from "../types/step";
+import { StepStatus, type Step, type StepId } from "../types/step";
 import type { Workflow } from "../types/workflow";
 
 export class Executor {
@@ -56,9 +56,11 @@ export class Executor {
       }
 
       const step = this.readyQueue.shift() as Step;
+      step.status = StepStatus.Running;
       let status = await this.#execute(step);
       if (status === "ok") {
         this.finished.set(step.id, true);
+        step.status = StepStatus.Finished;
       } else if (status === "failed") {
         console.error("failed");
       }
@@ -82,12 +84,14 @@ export class Executor {
 
       if (onRetry) {
         retries++;
+        step.status = StepStatus.Retrying;
         this.#execute(onRetry);
       }
     }
 
     if (onFailure && retries === (step.retries || 1)) {
       this.#execute(onFailure);
+      step.status = StepStatus.Failed;
       return "failed";
     }
 

@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseTomlWorkflow } from "./parser";
 import type { Workflow } from "../types/workflow";
+import { StepStatus } from "../types/step";
 
 test("parses TOML into Workflow object", () => {
   const toml = `name = "My Test Workflow"
@@ -26,6 +27,7 @@ commands = ["npm run test"]
         name: "Build",
         id: "build",
         commands: ["npm run build"],
+        status: StepStatus.Pending,
       },
       {
         workflowId: "my-test-workflow",
@@ -33,6 +35,7 @@ commands = ["npm run test"]
         id: "test",
         commands: ["npm run test"],
         needs: ["Build"],
+        status: StepStatus.Pending,
       },
     ],
   };
