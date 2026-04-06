@@ -25,10 +25,9 @@ try {
   if (options.check) {
     console.log(workflow);
   } else {
-    // TODO: implement this
     executeWorkflow(workflow);
   }
 } catch (e) {
   console.error(e);
-  process.exit();
+  process.exit(1);
 }
