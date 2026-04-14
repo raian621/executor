@@ -8,7 +8,7 @@ export function parseTomlWorkflow(tomlStr: string): Workflow {
 
   const steps: Step[] = Object.entries(workflowSteps).map(
     ([id, step]: [string, any]) => {
-      const derivedId = step.id || kebabifyName(step.name) || id;
+      const derivedId = step.id || id || kebabifyName(step.name);
       return { id: derivedId, workflowId, status: StepStatus.Pending, ...step } as Step;
     },
   );

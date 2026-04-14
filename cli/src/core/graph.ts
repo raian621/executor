@@ -20,7 +20,7 @@ export function buildGraph(workflow: Workflow): WorkflowGraph {
 function getEdgesFromSteps(steps: Step[]): Map<string, string[]> {
   return steps
     .filter((step) => step.needs !== undefined && step!.needs.length > 0)
-    .flatMap((step) => step!.needs!.map((need) => [step.id, need]))
+    .flatMap((step) => step!.needs!.map((need) => [need, step.id]))
     .reduce((edgeMap, [from, to]) => {
       edgeMap.getOrInsert(from as string, []).push(to as string);
       return edgeMap;

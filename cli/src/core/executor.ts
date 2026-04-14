@@ -33,14 +33,14 @@ export class Executor {
       const stepId = this.stepQueue.shift() as string;
       const step = graph.nodes.get(stepId) as Step;
 
-      if (step.needs && step.needs?.every((id) => this.finished.has(id))) {
-        this.stepQueue.push(stepId); // rotate ID until step prerequisites are finished
+      if (step.needs && !step.needs.every((id) => this.finished.has(id))) {
+        this.stepQueue.push(stepId);
         await new Promise((resolve) => setTimeout(resolve, 100));
         continue;
       }
 
       this.readyQueue.push(this.graph.nodes.get(stepId)!);
-      for (let childId in graph.edges.get(stepId)) {
+      for (const childId of graph.edges.get(stepId) ?? []) {
         this.stepQueue.push(childId);
       }
     }
@@ -104,7 +104,8 @@ export class Executor {
 
   async #executeCommands(commands: string[]): Promise<string> {
     for (const command of commands) {
-      const exitCode = await spawn(["bash", "-c", `${command}`]).exited;
+      const process = spawn(["bash", "-c", `${command}`])
+      const exitCode = await process.exited;
       if (exitCode != 0) {
         return "failed";
       }
