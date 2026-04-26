@@ -1,6 +1,4 @@
-import type { WorkflowGraph } from "../types/graph";
-import type { Step } from "../types/step";
-import type { Workflow } from "../types/workflow";
+import type { Workflow, WorkflowGraph, Step } from "@executor/types";
 
 export function buildGraph(workflow: Workflow): WorkflowGraph {
   const { name, id, failFast, steps } = workflow;

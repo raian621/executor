@@ -1,4 +1,4 @@
-import type { Step } from "./step";
+import type { Step } from "./step.js";
 
 export type WorkflowId = string;
 

@@ -1,6 +1,6 @@
 import type { Executor } from "../core/executor";
-import { StepStatus, type Step, type StepId } from "../types/step";
-import type { Verification } from "../types/verification";
+import type { Step, StepId, Verification } from "@executor/types";
+import { StepStatus } from "@executor/types";
 
 export function getSteps(executor: Executor): Step[] {
   return executor.graph.nodes.values().toArray();

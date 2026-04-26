@@ -1,7 +1,7 @@
 import { test, expect, vi } from "bun:test";
 import { Executor } from "./executor";
-import type { Workflow } from "../types/workflow";
-import { StepStatus } from "../types/step";
+import type { Workflow } from "@executor/types";
+import { StepStatus } from "@executor/types";
 
 test("workflow completes", async () => {
   const workflow: Workflow = {

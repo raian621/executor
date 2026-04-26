@@ -1,8 +1,7 @@
 import { build, spawn } from "bun";
 import { buildGraph } from "./graph";
-import type { WorkflowGraph } from "../types/graph";
-import { StepStatus, type Step, type StepId } from "../types/step";
-import type { Workflow } from "../types/workflow";
+import type { Workflow, WorkflowGraph, Step, StepId } from "@executor/types";
+import { StepStatus } from "@executor/types";
 
 export class Executor {
   readonly graph: WorkflowGraph;

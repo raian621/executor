@@ -1,5 +1,5 @@
-import type { Verification } from "./verification";
-import type { WorkflowId } from "./workflow";
+import type { Verification } from "./verification.js";
+import type { WorkflowId } from "./workflow.js";
 
 export type StepId = string;
 

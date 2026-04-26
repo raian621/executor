@@ -1,8 +1,8 @@
 import { test, expect } from "bun:test";
 import { Executor } from "../core/executor";
 import { getSteps, getStepStatus, verifyStep } from "./step";
-import type { Workflow } from "../types/workflow";
-import { StepStatus } from "../types/step";
+import type { Workflow } from "@executor/types";
+import { StepStatus } from "@executor/types";
 
 test("getSteps returns steps when executor starts", () => {
   const workflow: Workflow = {

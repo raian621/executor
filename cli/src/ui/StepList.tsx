@@ -3,7 +3,7 @@ import { Box } from "ink";
 import { Select } from "@inkjs/ui";
 import { getSteps, getStepStatus } from "../api/step";
 import type { Executor } from "../core/executor";
-import type { StepStatus } from "../types/step";
+import { StepStatus } from "@executor/types";
 
 interface StepListProps {
   executor: Executor;

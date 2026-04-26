@@ -1,6 +1,5 @@
 import { parse as parseToml } from "toml";
-import type { Workflow } from "../types/workflow";
-import { StepStatus, type Step } from "../types/step";
+import { StepStatus, type Workflow, type Step } from "@executor/types";
 
 export function parseTomlWorkflow(tomlStr: string): Workflow {
   const { id, name, failFast, steps: workflowSteps } = parseToml(tomlStr);
