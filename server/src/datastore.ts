@@ -25,12 +25,27 @@ export class DataStore {
     return this.workflows.get(workflowId) || null;
   }
 
+  deleteWorkflow(workflowId: WorkflowId, deleteSteps: boolean = true) {
+    this.workflows.delete(workflowId);
+    if (deleteSteps) {
+      this.stepStatuses.keys().forEach(([stepWorkflowId, stepId]) => {
+        if (stepWorkflowId === workflowId) {
+          this.deleteStepStatus(workflowId, stepId);
+        }
+      })
+    }
+  }
+
   updateStepStatus(workflowId: WorkflowId, stepId: StepId, status: StepStatus) {
     this.stepStatuses.set([workflowId, stepId], status);
   }
 
   getStepStatus(workflowId: WorkflowId, stepId: StepId): StepStatus | null {
     return this.stepStatuses.get([workflowId, stepId]) || null;
+  }
+
+  deleteStepStatus(workflowId: WorkflowId, stepId: StepId) {
+    this.stepStatuses.delete([workflowId, stepId]);
   }
 
   getStepStatuses(
