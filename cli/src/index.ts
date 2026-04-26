@@ -22,8 +22,8 @@ const [workflowPath] = program.args;
 try {
   const workflowStr = readFileSync(workflowPath as string).toString();
   const workflow = parseTomlWorkflow(workflowStr);
-  console.log(toMermaid(buildGraph(workflow)));
   if (options.check) {
+    console.log(toMermaid(buildGraph(workflow)));
     console.log(workflow);
   } else {
     const executor = new Executor(workflow, /* numWorkers= */ 8)
