@@ -2,6 +2,7 @@ import { build, spawn } from "bun";
 import { buildGraph } from "./graph";
 import type { Workflow, WorkflowGraph, Step, StepId } from "@executor/types";
 import { StepStatus } from "@executor/types";
+import type { Verification } from "@executor/types";
 
 export class Executor {
   readonly graph: WorkflowGraph;
@@ -20,6 +21,23 @@ export class Executor {
 
   async executeWorkflow() {
     await this.#breadthFirstExecution(this.graph, this.numWorkers);
+  }
+
+  getSteps(): Step[] {
+    return this.graph.nodes.values().toArray();
+  }
+
+  getStepStatus(stepId: StepId): StepStatus {
+    // TODO: maybe refactor this to use an Executor-internal status map
+    return this.graph.nodes.get(stepId)!.status;
+  }
+
+  verifyStep(stepId: StepId, verification: Verification) {
+    const node = this.graph.nodes.get(stepId)!;
+    // avoid double verification
+    if (node.verification === undefined) {
+      node.verification = verification;
+    }
   }
 
   async #breadthFirstExecution(graph: WorkflowGraph, workerCount: number) {
@@ -103,7 +121,7 @@ export class Executor {
 
   async #executeCommands(commands: string[]): Promise<string> {
     for (const command of commands) {
-      const process = spawn(["bash", "-c", `${command}`])
+      const process = spawn(["bash", "-c", `${command}`]);
       const exitCode = await process.exited;
       if (exitCode != 0) {
         return "failed";

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box } from "ink";
 import { Select } from "@inkjs/ui";
-import { getSteps, getStepStatus } from "../api/step";
 import type { Executor } from "../core/executor";
 import { StepStatus } from "@executor/types";
 
@@ -11,14 +10,18 @@ interface StepListProps {
 }
 
 export default function StepList({ executor, onSelect }: StepListProps) {
-  const steps = getSteps(executor);
+  const steps = executor.getSteps();
   const [statuses, setStatuses] = useState<Map<string, StepStatus>>(
-    new Map(steps.map((step) => [step.id, getStepStatus(executor, step.id)]))
+    new Map(steps.map((step) => [step.id, executor.getStepStatus(step.id)])),
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStatuses(new Map(steps.map((step) => [step.id, getStepStatus(executor, step.id)])));
+      setStatuses(
+        new Map(
+          steps.map((step) => [step.id, executor.getStepStatus(step.id)]),
+        ),
+      );
     }, 100);
     return () => clearInterval(interval);
   }, [executor, steps]);
@@ -34,4 +37,4 @@ export default function StepList({ executor, onSelect }: StepListProps) {
       />
     </Box>
   );
-};
+}
