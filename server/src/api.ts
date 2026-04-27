@@ -2,63 +2,84 @@ import { json, Router, type Request, type Response } from "express";
 import { DataStore } from "./datastore";
 import type { Workflow } from "@executor/types";
 
-export const api = Router();
-const datastore = new DataStore();
+export function createApiRouter(datastore: DataStore): Router {
+  const api = Router();
 
-api.use(json());
+  api.use(json());
 
-api.post("/workflow", (req: Request, res: Response) => {
-  const { workflow }: { workflow: Workflow } = req.body;
-  datastore.addWorkflow(workflow);
-  workflow.steps.forEach((step) =>
-    datastore.updateStepStatus(workflow.id, step.id, step.status),
-  );
-  return res.json({ status: "Successfully stored workflow data" });
-});
+  api.post("/workflow", (req: Request, res: Response) => {
+    const { workflow }: { workflow: Workflow } = req.body;
+    datastore.addWorkflow(workflow);
+    workflow.steps.forEach((step) =>
+      datastore.updateStepStatus(workflow.id, step.id, step.status),
+    );
+    return res.json({ status: "Successfully stored workflow data" });
+  });
 
-api.get("/workflow", (req: Request, res: Response) => {
-  const { workflowId } = req.body;
-  const workflow = datastore.getWorkflow(workflowId);
+  api.get("/workflow", (req: Request, res: Response) => {
+    const { workflowId } = req.body;
+    const workflow = datastore.getWorkflow(workflowId);
 
-  if (workflow === null) {
-    return res.json({ status: "Workflow not found" }).status(404);
-  }
+    if (workflow === null) {
+      return res.status(404).json({ status: "Workflow not found" });
+    }
 
-  return res.json({ workflow });
-});
+    return res.json({ workflow });
+  });
 
-api.post("/workflow/step/status", (req: Request, res: Response) => {
-  const { workflowId, stepId, stepStatus } = req.body;
-  datastore.updateStepStatus(workflowId, stepId, stepStatus);
-  return res.json({ status: "Successfully updated step status" });
-});
+  api.delete("/workflow", (req: Request, res: Response) => {
+    const { workflowId } = req.body;
+    if (!datastore.deleteWorkflow(workflowId)) {
+      return res.status(404).json({ status: "Workflow not found" });
+    }
+    return res.json({ status: "Workflow successfully deleted" });
+  });
 
-api.get("/workflow/step/status", (req: Request, res: Response) => {
-  const { workflowId, stepId } = req.body;
-  const stepStatus = datastore.getStepStatus(workflowId, stepId);
+  api.post("/workflow/step/status", (req: Request, res: Response) => {
+    const { workflowId, stepId, stepStatus } = req.body;
+    datastore.updateStepStatus(workflowId, stepId, stepStatus);
+    return res.json({ status: "Successfully updated step status" });
+  });
 
-  if (stepStatus === null) {
-    return res.json({ status: "Step not found" }).status(404);
-  }
+  api.get("/workflow/step/status", (req: Request, res: Response) => {
+    const { workflowId, stepId } = req.body;
+    const stepStatus = datastore.getStepStatus(workflowId, stepId);
 
-  return res.json({ stepStatus });
-});
+    if (stepStatus === null) {
+      return res.status(404).json({ status: "Step not found" });
+    }
 
-// Fetch multiple statuses; useful for clients that know some steps have reached
-// a terminal state and therefore won't have status updates.
-api.get("/workflow/step/statuses", (req: Request, res: Response) => {
-  const { workflowId, stepIds } = req.body;
-  const stepStatusList = datastore.getStepStatuses(workflowId, stepIds);
+    return res.json({ stepStatus });
+  });
 
-  if (stepStatusList === null) {
-    return res.json({ status: "Worlfow not found" });
-  }
+  // Fetch multiple statuses; useful for clients that know some steps have reached
+  // a terminal state and therefore won't have status updates.
+  api.get("/workflow/step/statuses", (req: Request, res: Response) => {
+    const { workflowId, stepIds } = req.body;
+    const stepStatusList = datastore.getStepStatuses(workflowId, stepIds);
 
-  if (
-    stepStatusList.some((stepStatusRes) => stepStatusRes.status === "NOT_FOUND")
-  ) {
-    return res.json({ stepStatusList }).status(207);
-  }
+    if (stepStatusList === null) {
+      return res.json({ status: "Worlfow not found" });
+    }
 
-  return res.json({ stepStatusList });
-});
+    if (
+      stepStatusList.some(
+        (stepStatusRes) => stepStatusRes.status === "NOT_FOUND",
+      )
+    ) {
+      return res.status(207).json({ stepStatusList });
+    }
+
+    return res.json({ stepStatusList });
+  });
+
+  api.delete("/workflow/step", (req: Request, res: Response) => {
+    const { workflowId, stepId } = req.body;
+    if (!datastore.deleteStepStatus(workflowId, stepId)) {
+      return res.status(404).json({ status: "Step not found" });
+    }
+    return res.json({ status: "Step successfully deleted" });
+  });
+
+  return api;
+}

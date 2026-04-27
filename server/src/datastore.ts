@@ -9,12 +9,14 @@ import type {
 } from "@executor/types";
 
 export class DataStore {
+  // Initial snapshots of workflows; don't rely on statuses from the workflows
+  // in this map
   workflows: Map<WorkflowId, Workflow>;
-  stepStatuses: Map<[WorkflowId, StepId], StepStatus>;
+  stepStatuses: Map<WorkflowId, Map<StepId, StepStatus>>;
 
   constructor() {
     this.workflows = new Map<WorkflowId, Workflow>();
-    this.stepStatuses = new Map<[WorkflowId, StepId], StepStatus>();
+    this.stepStatuses = new Map<WorkflowId, Map<StepId, StepStatus>>();
   }
 
   addWorkflow(workflow: Workflow) {
@@ -22,30 +24,54 @@ export class DataStore {
   }
 
   getWorkflow(workflowId: WorkflowId): Workflow | null {
-    return this.workflows.get(workflowId) || null;
+    return this.workflows.get(workflowId) ?? null;
   }
 
-  deleteWorkflow(workflowId: WorkflowId, deleteSteps: boolean = true) {
-    this.workflows.delete(workflowId);
-    if (deleteSteps) {
-      this.stepStatuses.keys().forEach(([stepWorkflowId, stepId]) => {
-        if (stepWorkflowId === workflowId) {
-          this.deleteStepStatus(workflowId, stepId);
-        }
-      })
+  deleteWorkflow(workflowId: WorkflowId, deleteSteps: boolean = true): boolean {
+    if (!this.workflows.delete(workflowId)) {
+      return false;
     }
+
+    let deletedSteps = true;
+    if (deleteSteps) {
+      for (const [stepWorkflowId, stepStatuses] of this.stepStatuses) {
+        if (stepWorkflowId !== workflowId) {
+          continue;
+        }
+        for (const stepId of stepStatuses.keys()) {
+          if (!stepStatuses.delete(stepId)) {
+            deletedSteps = false;
+          }
+        }
+      }
+    }
+
+    return deletedSteps;
   }
 
   updateStepStatus(workflowId: WorkflowId, stepId: StepId, status: StepStatus) {
-    this.stepStatuses.set([workflowId, stepId], status);
+    const stepStatuses = this.stepStatuses.getOrInsert(
+      workflowId,
+      new Map<StepId, StepStatus>(),
+    );
+    stepStatuses.set(stepId, status);
   }
 
   getStepStatus(workflowId: WorkflowId, stepId: StepId): StepStatus | null {
-    return this.stepStatuses.get([workflowId, stepId]) || null;
+    const stepStatuses = this.stepStatuses.get(workflowId);
+    if (stepStatuses === undefined) {
+      return null;
+    }
+    return stepStatuses.get(stepId) ?? null;
   }
 
-  deleteStepStatus(workflowId: WorkflowId, stepId: StepId) {
-    this.stepStatuses.delete([workflowId, stepId]);
+  deleteStepStatus(workflowId: WorkflowId, stepId: StepId): boolean {
+    const stepStatuses = this.stepStatuses.get(workflowId);
+    if (stepStatuses === undefined) {
+      return false;
+    }
+
+    return stepStatuses.delete(stepId);
   }
 
   getStepStatuses(
