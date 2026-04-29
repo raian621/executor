@@ -1,0 +1,25 @@
+{
+  "name": "@executor/client",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "bun test",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "latest",
+    "eslint": "^10.2.1",
+    "globals": "^17.5.0",
+    "typescript-eslint": "^8.58.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@executor/types": "../types"
+  }
+}

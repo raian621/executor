@@ -1,0 +1,15 @@
+name: Test Client Module
+
+on:
+  push:
+    paths: ["client/**", "types/**"]
+  pull_request:
+    paths: ["client/**", "types/**"]
+  workflow_call:
+  workflow_dispatch: 
+
+jobs:
+  test:
+    uses: './.github/workflows/test.yml'
+    with:
+      working-directory: client
