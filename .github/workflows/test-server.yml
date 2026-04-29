@@ -1,0 +1,15 @@
+name: Test Server Module
+
+on:
+  push:
+    paths: ["server/**", "types/**"]
+  pull_request:
+    paths: ["server/**", "types/**"]
+  workflow_call:
+  workflow_dispatch: 
+
+jobs:
+  test:
+    uses: './.github/workflows/test.yml'
+    with:
+      working-directory: server

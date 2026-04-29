@@ -1,0 +1,13 @@
+name: Test All Modules
+
+on:
+  workflow_call:
+  workflow_dispatch: 
+
+jobs:
+  test-cli:
+    uses: './.github/workflows/test-cli.yml'
+  test-server:
+    uses: './.github/workflows/test-server.yml'
+  test-ui:
+    uses: './.github/workflows/test-ui.yml'

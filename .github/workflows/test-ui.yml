@@ -1,0 +1,15 @@
+name: Test Web UI Module
+
+on:
+  push:
+    paths: ["ui/**", "types/**"]
+  pull_request:
+    paths: ["ui/**", "types/**"]
+  workflow_call:
+  workflow_dispatch: 
+
+jobs:
+  test:
+    uses: './.github/workflows/test.yml'
+    with:
+      working-directory: ui
