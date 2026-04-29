@@ -1,4 +1,4 @@
-import { test, expect, vi } from "bun:test";
+import { test, expect } from "bun:test";
 import { Executor } from "./executor";
 import type { Workflow } from "@executor/types";
 import { StepStatus } from "@executor/types";

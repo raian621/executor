@@ -1,4 +1,4 @@
-import { build, spawn } from "bun";
+import { spawn } from "bun";
 import { buildGraph } from "./graph";
 import type { Workflow, WorkflowGraph, Step, StepId } from "@executor/types";
 import { StepStatus } from "@executor/types";
@@ -74,7 +74,7 @@ export class Executor {
 
       const step = this.readyQueue.shift() as Step;
       step.status = StepStatus.Running;
-      let status = await this.#execute(step);
+      const status = await this.#execute(step);
       if (status === "ok") {
         this.finished.set(step.id, true);
         step.status = StepStatus.Finished;

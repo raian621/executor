@@ -1,5 +1,4 @@
 import type { Step, StepId } from "./step.js";
-import type { Workflow } from "./workflow.js";
 
 export interface WorkflowGraph {
   name: string;

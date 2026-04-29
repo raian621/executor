@@ -1,14 +1,30 @@
 import { parse as parseToml } from "toml";
 import { StepStatus, type Workflow, type Step } from "@executor/types";
+import type { StepId } from "@executor/types";
 
 export function parseTomlWorkflow(tomlStr: string): Workflow {
-  const { id, name, failFast, steps: workflowSteps } = parseToml(tomlStr);
-  const workflowId = id || kebabifyName(name);
+  const {
+    id,
+    name,
+    failFast,
+    steps: workflowSteps,
+  }: {
+    id?: string;
+    name: string;
+    failFast?: boolean;
+    steps: Map<StepId, Step>;
+  } = parseToml(tomlStr);
+  const workflowId = id ?? kebabifyName(name) ?? `workflow-${Math.random() * 1000 | 0}`;
 
   const steps: Step[] = Object.entries(workflowSteps).map(
-    ([id, step]: [string, any]) => {
+    ([id, step]: [string, Step]) => {
       const derivedId = step.id || id || kebabifyName(step.name);
-      return { id: derivedId, workflowId, status: StepStatus.Pending, ...step } as Step;
+      return {
+        ...step,
+        id: derivedId,
+        workflowId,
+        status: StepStatus.Pending,
+      } as Step;
     },
   );
 
@@ -16,6 +32,12 @@ export function parseTomlWorkflow(tomlStr: string): Workflow {
 }
 
 function kebabifyName(name?: string): string | undefined {
-  return name?.toLowerCase().split(' ').filter(word => word.length > 0)
-    .join('-');
+  if (name === undefined) {
+    return undefined;
+  }
+  return name
+    ?.toLowerCase()
+    .split(" ")
+    .filter((word) => word.length > 0)
+    .join("-");
 }
